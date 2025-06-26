@@ -115,5 +115,4 @@ public class TokenProvider {
 
         return new UsernamePasswordAuthenticationToken(userDetails, token, auths);
     }
-
 }

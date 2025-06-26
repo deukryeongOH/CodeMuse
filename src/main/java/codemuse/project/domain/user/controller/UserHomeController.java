@@ -48,7 +48,6 @@ public class UserHomeController {
         return "redirect:/login";
     }
 
-    // -- LOGIN --
     @GetMapping({"/", "/login"})
     public String loginPage(Model model) {
         model.addAttribute("userLoginDto", new UserLoginDto());
@@ -73,7 +72,6 @@ public class UserHomeController {
     public String dashboard(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             Model model) {
-        // 인증된 사용자 정보 추가
         model.addAttribute("name", userDetails.getUser().getName());
         model.addAttribute("nickName", userDetails.getUser().getNickName());
         return "dashboard";

@@ -9,6 +9,5 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 @RequiredArgsConstructor
 public class AdminController {
-
     private final AdminService adminService;
 }

@@ -13,6 +13,7 @@ import lombok.Setter;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "example")
 public class Example {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

@@ -9,6 +9,4 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/code")
 @Controller
 public class CodeController {
-
-    private final CodeService codeService;
 }

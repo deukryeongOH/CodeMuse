@@ -13,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -46,13 +45,4 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByAccountId(dto.getAccountId());
 
     }
-
-    @Override
-    public User findUser(String accountId) {
-        return userRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다."));
-    }
-
-
-
 }

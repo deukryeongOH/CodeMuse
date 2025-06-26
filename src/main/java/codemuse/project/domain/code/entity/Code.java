@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "code")
 public class Code {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
