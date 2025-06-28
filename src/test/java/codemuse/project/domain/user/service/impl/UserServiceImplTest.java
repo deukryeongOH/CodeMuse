@@ -1,5 +1,5 @@
 package codemuse.project.domain.user.service.impl;
-src/test/java/codemuse/project/domain/user/service/impl/UserServiceImplTest.java
+
 import codemuse.project.domain.user.dto.UserJoinDto;
 import codemuse.project.domain.user.dto.UserLoginDto;
 import codemuse.project.domain.user.entity.User;
