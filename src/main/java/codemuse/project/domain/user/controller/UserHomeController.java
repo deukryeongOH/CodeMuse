@@ -77,10 +77,23 @@ public class UserHomeController {
         return "dashboard";
     }
 
-
     @GetMapping("/findId")
-    public String findIdForm(){
+    public String findId(Model model){
+        String email = "";
+        model.addAttribute("email", email);
         return "findId";
+    }
+
+    @PostMapping("/findId")
+    public String findId(@RequestParam("email") String email, Model model){
+        User user = userService.findIdByEmail(email);
+        model.addAttribute("accountId", user.getAccountId());
+        return "getId";
+    }
+
+    @GetMapping("/getId")
+    public String getId(){
+        return "getId";
     }
 
     @GetMapping("/findPassword")

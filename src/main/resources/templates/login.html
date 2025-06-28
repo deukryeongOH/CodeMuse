@@ -20,15 +20,6 @@
     </style>
 </head>
 <body class="min-h-screen text-white flex animated-bg relative overflow-hidden">
-<!-- 좌측 심플 아이콘 메뉴 -->
-<nav class="flex flex-col items-center p-4 space-y-4 z-20">
-    <button class="p-2 bg-gray-800 rounded hover:bg-gray-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h.01M12 12h.01M19 12h.01"/></svg>
-    </button>
-    <button class="p-2 bg-gray-800 rounded hover:bg-gray-700">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 6h14M5 12h14M5 18h14"/></svg>
-    </button>
-</nav>
 
 <div class="flex-grow flex flex-col items-center justify-center">
     <!-- 로그인 카드 -->
@@ -51,15 +42,6 @@
             <a th:href="@{/findPassword}" class="hover:text-white">비밀번호 찾기</a>
         </div>
     </div>
-</div>
-
-<!-- 우측 상단 토글 -->
-<div class="absolute top-4 right-4">
-    <label class="inline-flex items-center cursor-pointer">
-        <input type="checkbox" class="sr-only peer" />
-        <div class="w-14 h-7 bg-gray-700 rounded-full peer-checked:bg-gray-300 transition"></div>
-        <div class="absolute left-1 top-1 w-5 h-5 bg-cyan-400 rounded-full peer-checked:left-8 transition"></div>
-    </label>
 </div>
 
 </body>

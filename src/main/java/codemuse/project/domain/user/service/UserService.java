@@ -8,4 +8,5 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UserService {
     void join(UserJoinDto dto);
+    User findIdByEmail(String email);
 }

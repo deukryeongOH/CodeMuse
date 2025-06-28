@@ -10,5 +10,7 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByAccountId(String accountId);
-    boolean existsByAccountId(@NotBlank(message = "아이디는 필수입니다.") String accountId);
+    boolean existsByAccountId(String accountId);
+    Optional<User> findByEmail(String email);
+
 }

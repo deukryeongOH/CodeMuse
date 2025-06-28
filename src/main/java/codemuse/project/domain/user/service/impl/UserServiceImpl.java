@@ -6,7 +6,6 @@ import codemuse.project.domain.user.entity.User;
 import codemuse.project.domain.user.repository.UserRepository;
 import codemuse.project.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,8 +40,16 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    @Override
+    public User findIdByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("해당 이메일 가진 회원이 존재하지 않습니다."));
+    }
+
     public boolean validateUserAccountId(UserJoinDto dto){
         return userRepository.existsByAccountId(dto.getAccountId());
 
     }
+
+
 }
