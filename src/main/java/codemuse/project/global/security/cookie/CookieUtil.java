@@ -9,11 +9,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CookieUtil {
 
-    private static final String JWT_COOKIE = "JEW_TOKEN";
+    private static final String JWT_COOKIE = "JWT_TOKEN";
 
     public void create(HttpServletResponse response, String accessToken){
         Cookie cookie = new Cookie(JWT_COOKIE, accessToken);
         cookie.setHttpOnly(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setMaxAge(24 * 60 * 60);
         response.addCookie(cookie);

@@ -2,6 +2,8 @@ package codemuse.project.domain.user.controller;
 
 import codemuse.project.domain.user.dto.UserJoinDto;
 import codemuse.project.domain.user.dto.UserLoginDto;
+import codemuse.project.domain.user.dto.UserResetPwdDto;
+import codemuse.project.domain.user.dto.UserTempPwdDto;
 import codemuse.project.domain.user.entity.User;
 import codemuse.project.domain.user.service.UserService;
 import codemuse.project.global.security.cookie.CookieUtil;
@@ -56,8 +58,7 @@ public class UserHomeController {
 
     @PostMapping("/login")
     public String Login(@ModelAttribute("userLoginDto") UserLoginDto dto,
-            HttpServletResponse response,
-            Model model) {
+            HttpServletResponse response) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(dto.getAccountId(), dto.getPassword())
@@ -96,11 +97,37 @@ public class UserHomeController {
         return "getId";
     }
 
+
     @GetMapping("/findPassword")
-    public String findPwdForm(){
+    public String findPwdForm(Model model){
+        model.addAttribute("userTempPwdDto", new UserTempPwdDto());
         return "findPassword";
     }
 
+    // 추후에 이메일을 통한 비밀번호 알아내기로 고도화
+    @PostMapping("/findPassword")
+    public String findPwdForm(@RequestParam("accountId") String accountId,
+                              @RequestParam("email") String email,
+                              Model model){
+        String tempPwd = userService.recoverPassword(accountId, email);
+        model.addAttribute("tempPwd", tempPwd);
+        return "tempPassword";
+    }
+
+    @GetMapping("/resetPassword")
+    public String resetPwdForm(Model model){
+        model.addAttribute("userResetPwdDto", new UserResetPwdDto());
+        return "resetPassword";
+    }
+
+    @PostMapping("/resetPassword")
+    public String resetPwdForm(@ModelAttribute("UserResetPwdDto") UserResetPwdDto dto) {
+
+        userService.resetPassword(dto);
+
+        return "redirect:/login";
+
+    }
 
     @GetMapping("/logout")
     public String logout(HttpServletResponse response) {

@@ -11,6 +11,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -43,6 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             response.sendRedirect("/login?expired");
             return;
             // 2) 또는 리프레시 토큰 검증 후 Access 토큰 재발급 로직 실행...
+        }catch (UsernameNotFoundException ex) {
+            // DB에 없으면 인증 실패 처리: SecurityContext는 비워두고 체인만 계속
+            logger.warn("인증 실패: 사용자 '{}' 없음");
         }
         filterChain.doFilter(request,response);
     }
