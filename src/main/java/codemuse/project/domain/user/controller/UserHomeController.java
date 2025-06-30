@@ -44,7 +44,7 @@ public class UserHomeController {
     }
 
     @PostMapping("/signUp")
-    public String signUp(@ModelAttribute("userJoinDto") UserJoinDto dto){
+    public String signUp(@Valid @ModelAttribute("userJoinDto") UserJoinDto dto){
 
         userService.join(dto);
         return "redirect:/login";

@@ -1,11 +1,13 @@
 package codemuse.project.domain.user.service.impl;
 
 import codemuse.project.domain.role.Role;
+import codemuse.project.domain.user.dto.UserDetailsDto;
 import codemuse.project.domain.user.dto.UserJoinDto;
 import codemuse.project.domain.user.dto.UserResetPwdDto;
 import codemuse.project.domain.user.entity.User;
 import codemuse.project.domain.user.repository.UserRepository;
 import codemuse.project.domain.user.service.UserService;
+import codemuse.project.global.security.spring.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -52,8 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String recoverPassword(String accountId, String email) {
-        User findUser = userRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하는 사용자가 없습니다."));
+        User findUser = findUser(accountId);
 
         if(!findUser.getEmail().equals(email)){
             throw new IllegalArgumentException("해당 계정아이디를 가진 회원의 이메일과 일치하지 않습니다.");
@@ -70,8 +71,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetPassword(UserResetPwdDto dto) {
-        User findUser = userRepository.findByAccountId(dto.getAccountId())
-                .orElseThrow(() -> new IllegalArgumentException("CustomUserDetails에 문제 발생"));
+        User findUser = findUser(dto.getAccountId());
 
         if(!passwordEncoder.matches(dto.getTempPwd(), findUser.getPassword())){
             throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
@@ -85,10 +85,54 @@ public class UserServiceImpl implements UserService {
         userRepository.save(findUser);
     }
 
-    public boolean validateUserAccountId(UserJoinDto dto){
-        return userRepository.existsByAccountId(dto.getAccountId());
+    @Override
+    public void updateUserDetails(CustomUserDetails customUserDetails, UserDetailsDto dto) {
+        User findUser = findUser(customUserDetails.getUsername());
 
+        findUser.setName(dto.getName());
+        findUser.setEmail(dto.getEmail());
+        findUser.setNickName(dto.getNickName());
+
+        userRepository.save(findUser);
     }
 
+    @Override
+    public UserDetailsDto getDetailsForm(CustomUserDetails customUserDetails) {
+        User user = findUser(customUserDetails.getUsername());
+
+        UserDetailsDto userDetailsDto = new UserDetailsDto();
+
+        userDetailsDto.setName(user.getName());
+        userDetailsDto.setEmail(user.getEmail());
+        userDetailsDto.setNickName(user.getNickName());
+
+        return userDetailsDto;
+    }
+
+    @Override
+    public void changePassword(String accountId, String password, String change, String confirm) {
+        User findUser = findUser(accountId);
+
+        if(!passwordEncoder.matches(password, findUser.getPassword())){
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        if(!change.equals(confirm)){
+            throw new IllegalArgumentException("변경할 비밀번호가 일치하지 않습니다.");
+        }
+
+        findUser.setPassword(passwordEncoder.encode(change));
+        userRepository.save(findUser);
+    }
+
+    private boolean validateUserAccountId(UserJoinDto dto){
+        return userRepository.existsByAccountId(dto.getAccountId());
+    }
+
+    private User findUser(String accountId){
+        return userRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new IllegalArgumentException("회원이 존재하지 않습니다."));
+
+    }
 
 }

@@ -14,6 +14,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -78,25 +79,21 @@ public class TokenProvider {
                 .compact();
     }
 
-    public String getAccountId(String token){
-        return Jwts.parser()
-                .verifyWith(key)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .getSubject();
-    }
-
     // 토큰 유효성 검사
     public boolean validateToken(String token){
+        if (!StringUtils.hasText(token)) {
+            log.info("JWT 토큰이 없습니다.");
+            return false;
+        }
+
         try{
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
-        } catch(SecurityException e){
+        } catch(SecurityException | MalformedJwtException e){
             log.warn("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e) {
             log.warn("만료된 JWT 토큰입니다.");
-        }catch (JwtException e) {
+        }catch (UnsupportedJwtException e) {
             // SignatureException, MalformedJwtException, UnsupportedJwtException 등 모두 여기서 잡힘
             log.warn("유효하지 않은 JWT 토큰입니다.", e);
         }
