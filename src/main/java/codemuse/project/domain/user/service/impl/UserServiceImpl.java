@@ -1,6 +1,6 @@
 package codemuse.project.domain.user.service.impl;
 
-import codemuse.project.domain.role.Role;
+import codemuse.project.global.role.Role;
 import codemuse.project.domain.user.dto.UserDetailsDto;
 import codemuse.project.domain.user.dto.UserJoinDto;
 import codemuse.project.domain.user.dto.UserResetPwdDto;
@@ -101,7 +101,7 @@ public class UserServiceImpl implements UserService {
         User user = findUser(customUserDetails.getUsername());
 
         UserDetailsDto userDetailsDto = new UserDetailsDto();
-
+        userDetailsDto.setAccountId(user.getAccountId());
         userDetailsDto.setName(user.getName());
         userDetailsDto.setEmail(user.getEmail());
         userDetailsDto.setNickName(user.getNickName());

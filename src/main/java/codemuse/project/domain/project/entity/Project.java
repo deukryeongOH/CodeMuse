@@ -3,11 +3,9 @@ package codemuse.project.domain.project.entity;
 import codemuse.project.domain.code.entity.Code;
 import codemuse.project.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -34,8 +32,15 @@ public class Project {
     )
     private List<Code> codes;
 
-    private String name;
-    private String description;
-    private Date createdAt;
+    private String title;
+    private String description; // 상세정보 들어가면 출력
+    private LocalDateTime createdAt;
+
+    @Builder
+    public Project(String title, String description){
+        this.title = title;
+        this.description = description;
+        this.createdAt = LocalDateTime.now();
+    }
 
 }

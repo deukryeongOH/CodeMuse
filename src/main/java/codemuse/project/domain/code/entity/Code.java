@@ -5,10 +5,14 @@ import codemuse.project.domain.review.entity.Review;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.extern.java.Log;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+
+import static java.time.LocalTime.now;
 
 @Getter
 @Setter
@@ -33,8 +37,14 @@ public class Code {
     )
     private List<Review> reviews;
 
-    private String title;
     private String language;
-    private File content_path;
-    private Date uploaded_at;
+    private String filePath;
+    private LocalDateTime uploaded_at;
+
+    @Builder
+    public Code(String language, String filePath){
+        this.language = language;
+        this.filePath = filePath;
+        this.uploaded_at = LocalDateTime.now();
+    }
 }

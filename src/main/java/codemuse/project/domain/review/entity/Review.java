@@ -43,4 +43,11 @@ public class Review {
             fetch = FetchType.LAZY
     )
     private List<Log> logs;
+
+    @Builder
+    public Review(String feedback, String suggestedCode, Code code){
+        this.feedback=feedback;
+        this.suggestedCode=suggestedCode;
+        this.code=code;
+    }
 }

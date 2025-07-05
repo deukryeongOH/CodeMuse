@@ -1,4 +1,4 @@
-package codemuse.project.domain.role;
+package codemuse.project.global.role;
 
 
 public enum Role {

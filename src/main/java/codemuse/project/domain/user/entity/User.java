@@ -1,6 +1,6 @@
 package codemuse.project.domain.user.entity;
 
-import codemuse.project.domain.role.Role;
+import codemuse.project.global.role.Role;
 import codemuse.project.domain.log.entity.Log;
 import codemuse.project.domain.project.entity.Project;
 import jakarta.persistence.*;
@@ -45,7 +45,7 @@ public class User {
             mappedBy = "user",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
     private List<Project> projects;
 

@@ -31,7 +31,7 @@
                 <h1 class="text-3xl font-bold">CodeMuse</h1>
             </div>
             <nav class="mt-4 md:mt-0 flex space-x-4">
-                <a th:href="@{/user/manageProjects}" class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">프로젝트 관리</a>
+                <a th:href="@{/project/manageProjects}" class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">프로젝트 관리</a>
                 <a th:href="@{/user/myPage}"   class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">마이페이지</a>
             </nav>
             <div class="mt-4 md:mt-0 flex items-center space-x-4">
@@ -40,34 +40,43 @@
             </div>
         </header>
 
-        <!-- 업로드 & 저장 카드 -->
-<!--        <section class="bg-gray-800 bg-opacity-60 rounded-xl p-6 space-y-6 shadow-lg">-->
-<!--            &lt;!&ndash; 드래그&드롭 업로드 &ndash;&gt;-->
-<!--            <div>-->
-<!--                <h2 class="text-2xl font-semibold mb-3">코드 업로드</h2>-->
-<!--                <form th:action="@{/uploadCode}" method="post" enctype="multipart/form-data"-->
-<!--                      class="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 hover:border-cyan-400 transition"-->
-<!--                      ondragover="event.preventDefault()" ondrop="handleDrop(event)">-->
-<!--                    <input type="file" name="codeFile" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />-->
-<!--                    <div class="text-center space-y-2">-->
-<!--                        <p>파일을 드래그하거나 클릭하여 선택하세요</p>-->
-<!--                        <button type="button" onclick="document.getElementById('fileInput').click()"-->
-<!--                                class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">파일 선택</button>-->
-<!--                    </div>-->
-<!--                </form>-->
-<!--            </div>-->
+         업로드 & 저장 카드
+        <section class="bg-gray-800 bg-opacity-60 rounded-xl p-6 space-y-6 shadow-lg">
+            <!-- 드래그&드롭 업로드 -->
+            <div>
+                <h2 class="text-2xl font-semibold mb-3">코드 업로드</h2>
+                <form th:action="@{/code/uploadCode}" method="post" enctype="multipart/form-data"
+                      class="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 hover:border-cyan-400 transition"
+                      ondragover="event.preventDefault()" ondrop="handleDrop(event)" id="uploadForm">
 
-<!--            &lt;!&ndash; 리뷰 저장 버튼 (항상 보이도록) &ndash;&gt;-->
-<!--            <div class="text-center">-->
-<!--                <button th:if="${aiFeedback != null}"-->
-<!--                        th:onclick="|location.href='@{/saveReview(id=${aiFeedback.reviewId})}'|"-->
-<!--                        class="px-8 py-2 bg-green-500 rounded-md hover:bg-green-600 transition">-->
-<!--                    리뷰 저장-->
-<!--                </button>-->
-<!--            </div>-->
-<!--        </section>-->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-        <!-- AI 피드백 아코디언 -->
+                    <input type="file" name="codeFile" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+
+                    <div class="text-center space-y-2">
+                        <p>파일을 드래그하거나 클릭하여 선택하세요</p>
+
+                        <button type="button" onclick="document.getElementById('fileInput').click()"
+                                class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">파일 선택</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center mt-6">
+                <button type="button"
+                        onclick="document.getElementById('uploadForm').submit()"
+                        class="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                    코드 분석
+                </button>
+                <button type="button"
+                        onclick="document.getElementById('uploadForm').submit()"
+                        class="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                    프로젝트 선택
+                </button>
+            </div>
+        </section>
+
+<!--         AI 피드백 아코디언-->
 <!--        <section class="bg-gray-800 bg-opacity-50 rounded-xl shadow-inner">-->
 <!--            <button type="button"-->
 <!--                    class="w-full flex justify-between items-center px-6 py-4 text-left"-->
@@ -88,10 +97,19 @@
 <!--                    <h3 class="font-medium">설명</h3>-->
 <!--                    <p class="mt-2" th:text="${aiFeedback.explanation}">~</p>-->
 <!--                </div>-->
+
+<!--                &lt;!&ndash; 리뷰 저장 버튼 (항상 보이도록) &ndash;&gt;-->
+<!--                <div class="text-center">-->
+<!--                    <button th:if="${aiFeedback != null}"-->
+<!--                            th:onclick="|location.href='@{/saveReview(id=${aiFeedback.reviewId})}'|"-->
+<!--                            class="px-8 py-2 bg-green-500 rounded-md hover:bg-green-600 transition">-->
+<!--                        리뷰 저장-->
+<!--                    </button>-->
+<!--                </div>-->
 <!--            </div>-->
 <!--        </section>-->
 
-        <!-- 학습 지원 카드 -->
+<!--         학습 지원 카드 -->
 <!--        <section th:if="${learningLinks != null}" class="bg-gray-800 bg-opacity-60 rounded-xl p-6 shadow-lg">-->
 <!--            <h2 class="text-2xl font-semibold mb-4">관련 학습 지원</h2>-->
 <!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">-->
