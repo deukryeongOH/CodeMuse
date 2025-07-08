@@ -14,9 +14,10 @@ on:
     branches: [ "main" ]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-    
+    env: 
+      OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
     permissions:
       contents: read
 
