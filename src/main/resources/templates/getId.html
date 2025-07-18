@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Get ID</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes bgAnimation {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animated-bg {
+          background: linear-gradient(-45deg, #1a202c, #2d3748, #4a5568, #718096);
+          background-size: 400% 400%;
+          animation: bgAnimation 20s ease infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen text-white flex animated-bg relative overflow-hidden">
+<div class="flex-grow flex flex-col items-center justify-center z-20">
+    <!-- 아이디 결과 카드 -->
+    <div class="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-8 rounded-2xl shadow-lg w-full max-w-sm text-center space-y-6">
+        <h2 class="text-3xl font-bold">아이디 찾기 결과</h2>
+        <p th:text="'회원님의 아이디는 ' + ${accountId} + '입니다.'" class="text-lg"></p>
+        <a th:href="@{/login}" class="inline-block mt-4 py-2 px-6 bg-cyan-500 rounded-md font-semibold hover:bg-cyan-600 transition">로그인</a>
+    </div>
+</div>
+</body>
+</html>

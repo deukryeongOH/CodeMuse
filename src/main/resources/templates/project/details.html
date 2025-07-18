@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns:th=http://www.thymeleaf.org>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeMuse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes bgAnimation {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animated-bg {
+          background: linear-gradient(-45deg, #1a202c, #2d3748, #4a5568, #718096);
+          background-size: 400% 400%;
+          animation: bgAnimation 20s ease infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+
+<div class="flex">
+    <!-- 사이드바 -->
+    <div class="w-1/4 p-4 bg-gray-800">
+        <h3 class="text-xl font-semibold mb-4">프로젝트 코드 목록</h3>
+        <ul>
+            <!-- 프로젝트에 포함된 코드 목록 -->
+            <li th:each="code : ${codes}" class="mb-3">
+                <a th:href="'#code-' + ${code.id}"
+                   class="text-blue-400 hover:underline"
+                   th:text="${code.title}"></a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 중앙 내용 -->
+    <div class="w-3/4 p-8">
+        <!-- 프로젝트 설명 -->
+        <h2 class="text-3xl font-semibold mb-6" th:text="${project.title}">프로젝트 제목</h2>
+        <p class="text-lg mb-6" th:text="${project.description}">프로젝트 설명</p>
+
+        <!-- 코드 내용 영역 -->
+        <div id="code-content" class="bg-gray-700 p-4 rounded-lg shadow-lg">
+            <p class="text-gray-300">선택된 코드를 클릭해주세요.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 코드 클릭 시 중앙에 코드 내용 표시
+    const codeLinks = document.querySelectorAll('a[href^="#code-"]');
+    const codeContent = document.getElementById('code-content');
+
+    codeLinks.forEach(link => {
+        link.addEventListener('click', function(event) {
+            event.preventDefault();
+            const codeId = this.getAttribute('href').replace('#', '');
+
+            // AJAX를 사용하여 코드 내용을 가져오기 (또는 서버에서 데이터를 전달받아 사용)
+            fetch(`/project/code/${codeId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // 코드 내용 표시
+                    codeContent.innerHTML = `<pre class="text-gray-300">${data.codeContent}</pre>`;
+                })
+                .catch(error => console.error('Error fetching code content:', error));
+        });
+    });
+</script>
+
+</body>
+</html>

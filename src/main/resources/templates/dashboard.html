@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CodeMuse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes bgAnimation {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .animated-bg {
+          background: linear-gradient(-45deg, #1a202c, #2d3748, #4a5568, #718096);
+          background-size: 400% 400%;
+          animation: bgAnimation 20s ease infinite;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col animated-bg text-white">
+
+<!-- 중앙 컨테이너 -->
+<div class="flex-grow flex items-start justify-center p-6">
+    <div class="w-full max-w-3xl space-y-8">
+
+        <!-- 헤더 + 네비게이션 -->
+        <header class="flex flex-col md:flex-row md:items-center justify-between pb-4 border-b border-gray-600">
+            <div class="flex items-center space-x-2">
+<!--                <img src="https://www.flaticon.com/kr/free-icon/leaf_892917" alt="CodeMuse Logo" class="h-8 w-8"/>-->
+                <h1 class="text-3xl font-bold">CodeMuse</h1>
+            </div>
+            <nav class="mt-4 md:mt-0 flex space-x-4">
+                <a th:href="@{/project/manageProjects}" class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">프로젝트 관리</a>
+                <a th:href="@{/user/myPage}"   class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">마이페이지</a>
+            </nav>
+            <div class="mt-4 md:mt-0 flex items-center space-x-4">
+                <span>Welcome, <b th:text="${name}">User</b></span>
+                <a th:href="@{/logout}" class="text-red-400 hover:text-red-600 transition">Logout</a>
+            </div>
+        </header>
+
+<!--         업로드 & 저장 카드-->
+        <section class="bg-gray-800 bg-opacity-60 rounded-xl p-6 space-y-6 shadow-lg">
+            <!-- 파일 업로드 + 프로젝트 선택 폼 -->
+            <form th:action="@{/code/uploadCode}" method="post" enctype="multipart/form-data"
+                  class="space-y-6" th:object="${uploadRequestDto}">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+                <!-- 드래그&드롭 업로드 -->
+                <div class="relative flex flex-col items-center justify-center border-2 border-dashed border-gray-600 rounded-lg p-8 hover:border-cyan-400 transition"
+                     ondragover="event.preventDefault()" ondrop="handleDrop(event)">
+                    <input type="file" name="codeFile" id="fileInput"
+                           class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+
+                    <div class="text-center space-y-2 text-gray-200">
+                        <p>파일을 드래그하거나 클릭하여 선택하세요</p>
+                        <button type="button" onclick="fileInput.click()"
+                                class="px-4 py-2 bg-cyan-500 rounded-md hover:bg-cyan-600 transition">
+                            파일 선택
+                        </button>
+                    </div>
+                </div>
+                <p id="selectedFile" class="text-gray-200">선택된 파일: 없음</p>
+                <textarea
+                        id="codeTextarea"
+                        name="codeText"
+                        rows="8"
+                        class="w-full border border-gray-600 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                        placeholder="코드를 여기에 붙여넣으세요 (텍스트 입력 지원)"
+                ></textarea>
+
+                <!-- 프로젝트 선택 (필수) -->
+                <div>
+                    <label for="projectSelect" class="block mb-2 text-gray-200 font-medium">프로젝트 선택<span class="text-red-500">*</span></label>
+                    <select id="projectSelect" th:field="*{projectId}" required
+                            class="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 text-white">
+                        <option value="" disabled selected>프로젝트를 선택하세요</option>
+                        <option th:each="proj : ${projects}"
+                                th:value="${proj.id}"
+                                th:text="${proj.title}">프로젝트명
+                        </option>
+                    </select>
+                </div>
+
+                <!-- 업로드 후 분석 버튼 -->
+                <div class="text-center">
+                    <button type="submit" name="action" value="analyze"
+                            class="px-6 py-3 bg-green-500 text-white rounded-md hover:bg-green-600 transition">
+                        코드 분석
+                    </button>
+                </div>
+            </form>
+        </section>
+
+<!--         AI 피드백 아코디언-->
+        <section class="bg-gray-800 bg-opacity-50 rounded-xl shadow-inner">
+            <button type="button"
+                    class="w-full flex justify-between items-center px-6 py-4 text-left"
+                    onclick="this.nextElementSibling.classList.toggle('hidden')">
+                <span class="text-xl font-semibold">AI 피드백</span>
+                <svg class="w-6 h-6 transform transition-transform" fill="none" stroke="currentColor"
+                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 9l-7 7-7-7"></path>
+                </svg>
+            </button>
+            <div class="px-6 pb-6 space-y-4 hidden">
+                <div>
+                    <h3 class="font-medium">수정된 코드</h3>
+                    <div th:if="${aiFeedback != null}">
+                        <pre class="mt-2 bg-gray-900 p-4 rounded overflow-auto" th:text="${aiFeedback.improvedCode}"></pre>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="font-medium">설명</h3>
+                    <div th:if="${aiFeedback != null}">
+                        <p class="mt-2" th:text="${aiFeedback.explanation}"></p>
+                    </div>
+                </div>
+                <!-- 리뷰 저장 버튼 (항상 보이도록) -->
+<!--                <div class="text-center">-->
+<!--                    <button th:if="${aiFeedback != null}"-->
+<!--                            th:onclick="|location.href='@{/saveReview(id=${aiFeedback.reviewId})}'|"-->
+<!--                            class="px-8 py-2 bg-green-500 rounded-md hover:bg-green-600 transition">-->
+<!--                        리뷰 저장-->
+<!--                    </button>-->
+<!--                </div>-->
+            </div>
+        </section>
+
+<!--         학습 지원 카드 -->
+<!--        <section th:if="${learningLinks != null}" class="bg-gray-800 bg-opacity-60 rounded-xl p-6 shadow-lg">-->
+<!--            <h2 class="text-2xl font-semibold mb-4">관련 학습 지원</h2>-->
+<!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">-->
+<!--                <div th:each="link : ${learningLinks}"-->
+<!--                     class="bg-gray-700 rounded p-4 hover:bg-gray-600 transition">-->
+<!--                    <a th:href="${link.url}" target="_blank" class="font-medium underline"-->
+<!--                       th:text="${link.title}"></a>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </section>-->
+
+    </div>
+</div>
+
+<script>
+    const fileInput = document.getElementById('fileInput');
+  const codeTextarea = document.getElementById('codeTextarea');
+  const selectedFile = document.getElementById('selectedFile');
+
+  // 파일 선택 시
+  fileInput.addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) {
+      selectedFile.textContent = `선택된 파일: ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        codeTextarea.value = evt.target.result;
+      };
+      reader.readAsText(file);
+    } else {
+      selectedFile.textContent = '선택된 파일: 없음';
+    }
+  });
+
+  // 드롭 시
+  function handleDrop(event) {
+    event.preventDefault();
+    const file = event.dataTransfer.files[0];
+    if (file) {
+      selectedFile.textContent = `선택된 파일: ${file.name}`;
+      const reader = new FileReader();
+      reader.onload = evt => {
+        codeTextarea.value = evt.target.result;
+      };
+      reader.readAsText(file);
+      // 드롭된 파일을 실제 file input 에도 설정하려면:
+      const dataTransfer = new DataTransfer();
+      dataTransfer.items.add(file);
+      fileInput.files = dataTransfer.files;
+    }
+  }
+</script>
+</body>
+</html>
