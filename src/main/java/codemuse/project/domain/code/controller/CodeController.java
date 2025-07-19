@@ -5,6 +5,7 @@ import codemuse.project.domain.code.dto.CodeFeedBackDto;
 import codemuse.project.domain.code.dto.UploadRequestDto;
 import codemuse.project.domain.code.service.CodeService;
 import codemuse.project.domain.project.repository.ProjectRepository;
+import codemuse.project.domain.user.entity.User;
 import codemuse.project.global.security.spring.CustomUserDetails;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +28,15 @@ public class CodeController {
     @PostMapping("/uploadCode")
     public String upload(@ModelAttribute("uploadRequestDto") UploadRequestDto dto,
                          @RequestParam("codeFile") MultipartFile file,
+                         @AuthenticationPrincipal CustomUserDetails customUserDetails,
                          Model model) throws Exception {
-
+        User user = customUserDetails.getUser();
         Long codeId = codeService.saveCode(dto.getProjectId(), file);
 
         CodeFeedBackDto feedBackDto = codeService.analyzeAndDevelop(codeId);
         model.addAttribute("aiFeedback", feedBackDto);
-//        model.addAttribute("learningLinks", );
+        model.addAttribute("projects", user.getProjects());
+        //model.addAttribute("learningLinks", );
 
         return "dashboard";
     }
