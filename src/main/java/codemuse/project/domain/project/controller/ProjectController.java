@@ -2,17 +2,14 @@ package codemuse.project.domain.project.controller;
 
 import codemuse.project.domain.code.entity.Code;
 import codemuse.project.domain.project.dto.CreateProjectDto;
-import codemuse.project.domain.project.dto.ProjectCodesDto;
 import codemuse.project.domain.project.entity.Project;
 import codemuse.project.domain.project.service.ProjectService;
-import codemuse.project.domain.user.entity.User;
 import codemuse.project.global.security.spring.CustomUserDetails;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -63,14 +60,32 @@ public class ProjectController {
     public String projectDetails(@PathVariable("id") Long projectId,
                                  @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                  Model model){
-        ProjectCodesDto dto = projectService.getCodeList(customUserDetails, projectId);
-        model.addAttribute("codes", dto);
+        List<Code> codes = projectService.getCodeList(customUserDetails, projectId);
+        Project project = projectService.getProject(projectId);
+
+        model.addAttribute("codes", codes);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("title", project.getTitle());
+        model.addAttribute("description", project.getDescription());
         return "project/details";
     }
 
-    @PostMapping("/details")
-    public String projectDetails(){
-        return "project/details";
+    @PostMapping("{projectId}/delete/code/{codeId}")
+    public String deleteCodeFromProject(@PathVariable("projectId") Long projectId,
+                                        @PathVariable("codeId") Long codeId,
+                                        @AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                        Model model){
+        projectService.deleteCodeFromProject(projectId, codeId);
+
+        Project project = projectService.getProject(projectId);
+        List<Code> codes = projectService.getCodeList(customUserDetails, projectId);
+
+        model.addAttribute("codes", codes);
+        model.addAttribute("projectId", projectId);
+        model.addAttribute("title", project.getTitle());
+        model.addAttribute("description", project.getDescription());
+
+        return "redirect:/project/details/" + projectId;
     }
 
 }

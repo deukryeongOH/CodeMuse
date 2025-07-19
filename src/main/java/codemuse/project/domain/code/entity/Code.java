@@ -41,14 +41,22 @@ public class Code {
 
     @Lob
     @Column(columnDefinition = "TEXT")
-    private String code;
+    private String providedCode;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String improvedCode;
+
+    @Lob
+    @Column(columnDefinition = "TEXT")
+    private String explanation;
 
     private LocalDateTime uploaded_at;
 
     @Builder
-    public Code(String language, String code){
+    public Code(String language, String providedCode){
         this.language = language;
-        this.code = code;
+        this.providedCode = providedCode;
         this.uploaded_at = LocalDateTime.now();
     }
 }

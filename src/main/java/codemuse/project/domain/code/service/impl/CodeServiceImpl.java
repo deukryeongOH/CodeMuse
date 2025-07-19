@@ -42,7 +42,7 @@ public class CodeServiceImpl implements CodeService {
         Code code = codeRepository.findById(codeId)
                 .orElseThrow(() -> new IllegalArgumentException("코드 정보가 존재하지 않습니다."));
 
-        String prompt = generatePrompt(code.getCode());
+        String prompt = generatePrompt(code.getProvidedCode());
 
         CodeFeedBackDto dto;
         try {
@@ -53,6 +53,10 @@ public class CodeServiceImpl implements CodeService {
         } catch (QuotaExceededException e) {
             throw new RuntimeException(e);
         }
+
+        code.setImprovedCode(dto.getImprovedCode());
+        code.setExplanation(dto.getExplanation());
+        codeRepository.save(code);
 
         Review review = Review.builder()
                 .code(code)
@@ -96,18 +100,19 @@ public class CodeServiceImpl implements CodeService {
      */
     @Override
     public Long saveCode(Long projectId, MultipartFile file) throws IOException {
-        String code = new String(file.getBytes(), StandardCharsets.UTF_8);
+        String providedCode = new String(file.getBytes(), StandardCharsets.UTF_8);
 
         Code savedCode = Code.builder()
-                .code(code)
+                .providedCode(providedCode)
                 .build();
 
         Project findProject = projectRepository.findById(projectId)
                         .orElseThrow();
 
         savedCode.setProject(findProject);
-        findProject.getCodes().add(savedCode);
         codeRepository.save(savedCode);
+
+        findProject.getCodes().add(savedCode);
 
         return savedCode.getId();
     }
