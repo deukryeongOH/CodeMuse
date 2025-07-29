@@ -2,6 +2,7 @@ package codemuse.project.domain.code.controller;
 
 //import codemuse.project.domain.code.dto.CodeFeedBackDto;
 import codemuse.project.domain.code.dto.CodeFeedBackDto;
+import codemuse.project.domain.code.dto.LearningLink;
 import codemuse.project.domain.code.dto.UploadRequestDto;
 import codemuse.project.domain.code.service.CodeService;
 import codemuse.project.domain.project.repository.ProjectRepository;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 @RequiredArgsConstructor
 @RequestMapping("/code")
@@ -23,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 public class CodeController {
 
     private final CodeService codeService;
-    private final ProjectRepository projectRepository;
 
     @PostMapping("/uploadCode")
     public String upload(@ModelAttribute("uploadRequestDto") UploadRequestDto dto,
@@ -36,7 +37,6 @@ public class CodeController {
         CodeFeedBackDto feedBackDto = codeService.analyzeAndDevelop(codeId);
         model.addAttribute("aiFeedback", feedBackDto);
         model.addAttribute("projects", user.getProjects());
-        //model.addAttribute("learningLinks", );
 
         return "dashboard";
     }

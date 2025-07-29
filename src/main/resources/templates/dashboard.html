@@ -66,7 +66,7 @@
                         id="codeTextarea"
                         name="codeText"
                         rows="8"
-                        class="w-full border border-gray-600 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+                        class="w-full bg-black text-white border border-gray-600 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                         placeholder="코드를 여기에 붙여넣으세요 (텍스트 입력 지원)"
                 ></textarea>
 
@@ -118,28 +118,20 @@
                         <p class="mt-2" th:text="${aiFeedback.explanation}"></p>
                     </div>
                 </div>
-                <!-- 리뷰 저장 버튼 (항상 보이도록) -->
-<!--                <div class="text-center">-->
-<!--                    <button th:if="${aiFeedback != null}"-->
-<!--                            th:onclick="|location.href='@{/saveReview(id=${aiFeedback.reviewId})}'|"-->
-<!--                            class="px-8 py-2 bg-green-500 rounded-md hover:bg-green-600 transition">-->
-<!--                        리뷰 저장-->
-<!--                    </button>-->
-<!--                </div>-->
             </div>
         </section>
 
-<!--         학습 지원 카드 -->
-<!--        <section th:if="${learningLinks != null}" class="bg-gray-800 bg-opacity-60 rounded-xl p-6 shadow-lg">-->
-<!--            <h2 class="text-2xl font-semibold mb-4">관련 학습 지원</h2>-->
-<!--            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">-->
-<!--                <div th:each="link : ${learningLinks}"-->
-<!--                     class="bg-gray-700 rounded p-4 hover:bg-gray-600 transition">-->
-<!--                    <a th:href="${link.url}" target="_blank" class="font-medium underline"-->
-<!--                       th:text="${link.title}"></a>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </section>-->
+<!--         학습 지원 카드-->
+        <section th:if="${aiFeedback != null}" class="bg-gray-800 bg-opacity-60 rounded-xl p-6 shadow-lg">
+            <h2 class="text-2xl font-semibold mb-4">관련 학습 지원</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div th:each="link : ${aiFeedback.links}"
+                     class="bg-gray-700 rounded p-4 hover:bg-gray-600 transition">
+                    <a th:href="${link.url}" target="_blank" class="font-medium underline"
+                       th:text="${link.title}"></a>
+                </div>
+            </div>
+        </section>
 
     </div>
 </div>

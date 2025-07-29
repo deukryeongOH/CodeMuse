@@ -14,11 +14,15 @@ import java.util.List;
 @NoArgsConstructor
 public class CodeFeedBackDto {
 
+
+    private Long reviewId;
+
     @JsonProperty("improvedCode")
     private String improvedCode;
 
     @JsonProperty("explanation")
     private String explanation;
 
-//    private List<LearningLink> links;
+    @JsonProperty("links")
+    private List<LearningLink> links;
 }
