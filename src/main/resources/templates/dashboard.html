@@ -20,6 +20,7 @@
 </head>
 <body class="min-h-screen flex flex-col animated-bg text-white">
 
+<p th:text="${errorMessage}">오류시 보여짐</p>
 <!-- 중앙 컨테이너 -->
 <div class="flex-grow flex items-start justify-center p-6">
     <div class="w-full max-w-3xl space-y-8">
@@ -65,7 +66,7 @@
                 <textarea
                         id="codeTextarea"
                         name="codeText"
-                        rows="8"
+                        rows="20"
                         class="w-full bg-black text-white border border-gray-600 rounded-lg p-4 focus:outline-none focus:ring-2 focus:ring-cyan-400"
                         placeholder="코드를 여기에 붙여넣으세요 (텍스트 입력 지원)"
                 ></textarea>

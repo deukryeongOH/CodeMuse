@@ -104,8 +104,7 @@ public class CodeServiceImpl implements CodeService {
      *  코드 업로드(코드를 저장할 Project 선택 후 코드 저장)
      */
     @Override
-    public Long saveCode(Long projectId, MultipartFile file) throws IOException {
-        String providedCode = new String(file.getBytes(), StandardCharsets.UTF_8);
+    public Long saveCode(Long projectId, String providedCode) throws IOException {
 
         Code savedCode = Code.builder()
                 .providedCode(providedCode)
