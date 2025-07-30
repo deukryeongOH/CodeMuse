@@ -3,6 +3,7 @@ package codemuse.project.domain.code.service.impl;
 //import codemuse.project.domain.code.dto.CodeFeedBackDto;
 import codemuse.project.domain.code.dto.CodeFeedBackDto;
 import codemuse.project.domain.code.dto.LearningLink;
+import codemuse.project.domain.code.dto.UploadRequestDto;
 import codemuse.project.domain.code.entity.Code;
 import codemuse.project.domain.code.repository.CodeRepository;
 import codemuse.project.domain.code.service.CodeService;
@@ -92,7 +93,7 @@ public class CodeServiceImpl implements CodeService {
         // 실제 요청
         sb.append("너는 컴퓨터공학 경력 10년차 개발자야. ").append("\n")
                 .append("오류가 없고 가독성이 좋으며 효율성이 뛰어난 코드가 필요해").append("\n")
-                .append("주어진 코드를 다음 기준에 따라 개선하고, ").append("\n")
+                .append("주어진 코드를 다음 기준에 따라 개선해줘. ").append("\n")
                 .append("- 기존 출력 값이나 반환 값이 **절대** 달라지지 않게 유지할 것.").append("\n")
                 .append("- 시간 복잡도와 공간 복잡도를 모두 고려해 최적화할 것.").append("\n")
                 .append("- 개선된 코드에 맞춰, 해당 기능을 더 깊이 학습할 수 있는 영상·문서 링크 5개를 links 배열로 제공할 것.").append("\n");
@@ -119,6 +120,25 @@ public class CodeServiceImpl implements CodeService {
         findProject.getCodes().add(savedCode);
 
         return savedCode.getId();
+    }
+
+    @Override
+    public Long checkInput(UploadRequestDto dto) throws IOException {
+        Long codeId;
+        if (dto.getCodeText() == null && !dto.getCodeFile().isEmpty()) {
+            String code = new String(dto.getCodeFile().getBytes(), StandardCharsets.UTF_8);
+            codeId = saveCode(dto.getProjectId(), code);
+        } else if (dto.getCodeText() != null && dto.getCodeFile().isEmpty()) {
+            codeId = saveCode(dto.getProjectId(), dto.getCodeText());
+        }
+        else if(dto.getCodeText() != null && !dto.getCodeFile().isEmpty()){
+            String code = new String(dto.getCodeFile().getBytes(), StandardCharsets.UTF_8);
+            codeId = saveCode(dto.getProjectId(), code);
+        }
+        else{
+            codeId = null;
+        }
+        return codeId;
     }
 
 }

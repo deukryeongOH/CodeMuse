@@ -28,22 +28,18 @@ public class CodeController {
 
     @PostMapping("/uploadCode")
     public String upload(@ModelAttribute("uploadRequestDto") UploadRequestDto dto,
-                         @RequestParam(value = "codeFile", required = false) MultipartFile file,
-                         @RequestParam(value = "codeText", required = false) String textCode,
+//                         @RequestParam(value = "codeFile", required = false) MultipartFile file,
+//                         @RequestParam(value = "codeText", required = false) String textCode,
                          @AuthenticationPrincipal CustomUserDetails customUserDetails,
                          Model model) throws Exception {
         User user = customUserDetails.getUser();
-        Long codeId;
-        if (textCode == null && !file.isEmpty()) {
-            String code = new String(file.getBytes(), StandardCharsets.UTF_8);
-            codeId = codeService.saveCode(dto.getProjectId(), code);
-        } else if (textCode != null && file.isEmpty()) {
-            codeId = codeService.saveCode(dto.getProjectId(), textCode);
-        }
-        else{
+        Long codeId = codeService.checkInput(dto);
+
+        if (codeId == null) {
             model.addAttribute("errorMessage", "파일 또는 코드 텍스트를 반드시 입력해주세요.");
             return "dashboard";
         }
+
 
         CodeFeedBackDto feedBackDto = codeService.analyzeAndDevelop(codeId);
         model.addAttribute("aiFeedback", feedBackDto);
