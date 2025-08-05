@@ -29,27 +29,15 @@ public class Code {
     @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
-    @OneToMany(
-            mappedBy = "code",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    private List<Review> reviews;
+    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JoinColumn(name = "review_id")
+    private Review review;
 
     private String language;
 
     @Lob
     @Column(columnDefinition = "TEXT")
     private String providedCode;
-
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String improvedCode;
-
-    @Lob
-    @Column(columnDefinition = "TEXT")
-    private String explanation;
 
     private LocalDateTime uploaded_at;
 

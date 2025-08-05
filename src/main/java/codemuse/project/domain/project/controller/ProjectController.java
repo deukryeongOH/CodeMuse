@@ -1,10 +1,18 @@
 package codemuse.project.domain.project.controller;
 
+import codemuse.project.domain.code.dto.LearningLink;
 import codemuse.project.domain.code.entity.Code;
+import codemuse.project.domain.link.entity.Link;
+import codemuse.project.domain.project.dto.CodeDto;
 import codemuse.project.domain.project.dto.CreateProjectDto;
+import codemuse.project.domain.project.dto.ProjectDto;
 import codemuse.project.domain.project.entity.Project;
 import codemuse.project.domain.project.service.ProjectService;
+import codemuse.project.domain.review.entity.Review;
+import codemuse.project.domain.review.service.ReviewService;
 import codemuse.project.global.security.spring.CustomUserDetails;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,6 +28,7 @@ import java.util.List;
 public class ProjectController {
 
     private final ProjectService projectService;
+    private final ReviewService reviewService;
 
     /**
      *  프로젝트 리스트 컨트롤러
@@ -27,7 +36,7 @@ public class ProjectController {
     @GetMapping("/manageProjects")
     public String projectList(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                               Model model){
-        List<Project> list = projectService.findAllProject(customUserDetails);
+        List<ProjectDto> list = projectService.findAllProject(customUserDetails);
         model.addAttribute("projects", list);
         return "project/manageProjects";
     }
@@ -59,14 +68,18 @@ public class ProjectController {
     @GetMapping("/details/{id}")
     public String projectDetails(@PathVariable("id") Long projectId,
                                  @AuthenticationPrincipal CustomUserDetails customUserDetails,
-                                 Model model){
-        List<Code> codes = projectService.getCodeList(customUserDetails, projectId);
-        Project project = projectService.getProject(projectId);
+                                 Model model) throws JsonProcessingException {
+        List<CodeDto> codes = projectService.getCodeList(customUserDetails, projectId);
+        ProjectDto projectDto = projectService.getProject(projectId);
+
+        // 여기가 문제
+        String linkJson = projectService.EncodeLink(codes);
 
         model.addAttribute("codes", codes);
-        model.addAttribute("projectId", projectId);
-        model.addAttribute("title", project.getTitle());
-        model.addAttribute("description", project.getDescription());
+        model.addAttribute("projectId", projectDto.getId());
+        model.addAttribute("title", projectDto.getTitle());
+        model.addAttribute("description", projectDto.getDescription());
+        model.addAttribute("linksJson", linkJson);
         return "project/details";
     }
 
@@ -77,13 +90,13 @@ public class ProjectController {
                                         Model model){
         projectService.deleteCodeFromProject(projectId, codeId);
 
-        Project project = projectService.getProject(projectId);
-        List<Code> codes = projectService.getCodeList(customUserDetails, projectId);
+        ProjectDto projectDto = projectService.getProject(projectId);
+        List<CodeDto> codes = projectService.getCodeList(customUserDetails, projectId);
 
         model.addAttribute("codes", codes);
-        model.addAttribute("projectId", projectId);
-        model.addAttribute("title", project.getTitle());
-        model.addAttribute("description", project.getDescription());
+        model.addAttribute("projectId", projectDto.getId());
+        model.addAttribute("title", projectDto.getTitle());
+        model.addAttribute("description", projectDto.getDescription());
 
         return "redirect:/project/details/" + projectId;
     }

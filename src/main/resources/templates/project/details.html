@@ -37,9 +37,10 @@
                    class="text-blue-400 hover:underline flex-1"
                    th:attr="
              data-provided-code=${code.providedCode},
-             data-improved-code=${code.improvedCode},
-             data-explanation=${code.explanation}"
-                   th:text="${code.id}"
+             data-improved-code=${code.review != null} ? ${code.review.improvedCode} : '',
+             data-explanation=${code.review != null} ? ${code.review.explanation} : '',
+             data-learning-links=${linksJson}"
+                th:text="${code.id}"
                    onclick="showCode(this); return false;">
                 </a>
                 <form th:action="@{/project/{projectId}/delete/code/{codeId}(projectId=${projectId},codeId=${code.id})}"
@@ -78,28 +79,72 @@
                     <h4 class="font-semibold mb-1">🔹 설명</h4>
                     <p id="explanation" class="bg-gray-800 p-3 rounded whitespace-pre-wrap"></p>
                 </div>
+                <div id="learning-links-section" class="hidden">
+                    <h4 class="font-semibold mb-1">🔹 관련 학습 링크</h4>
+                    <p id="learning-links" class="bg-gray-800 p-3 rounded whitespace-pre-wrap"></p>
+                </div>
             </div>
         </div>
     </main>
 </div>
 
 <script th:inline="javascript">
+    // Base64 디코딩 함수 (UTF-8 문자 깨짐 방지)
+    function decodeBase64(str) {
+        try {
+            return decodeURIComponent(atob(str).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+        } catch (e) {
+            console.error('Base64 decode failed', e);
+            return '[]'; // 오류 발생 시 빈 배열 형태의 문자열 반환
+        }
+    }
+
     function showCode(el) {
-      // placeholder 숨기고 상세 뷰 보이기
-      document.getElementById('placeholder').classList.add('hidden');
-      document.getElementById('detail-view').classList.remove('hidden');
+        document.getElementById('placeholder').classList.add('hidden');
+        document.getElementById('detail-view').classList.remove('hidden');
 
-      // data- 속성에서 값 꺼내기
-      var provided = el.getAttribute('data-provided-code') || '';
-      var improved = el.getAttribute('data-improved-code') || '';
-      var explanation = el.getAttribute('data-explanation') || '';
+        var provided = el.getAttribute('data-provided-code') || '';
+        var improved = el.getAttribute('data-improved-code') || '';
+        var explanation = el.getAttribute('data-explanation') || '';
+        var learningLinksEncoded = el.getAttribute('data-learning-links') || ''; // 링크 데이터는 이미 JSON 문자열 형태
 
-      // 각 영역에 텍스트로 삽입
-      document.getElementById('provided-code').textContent = provided;
-      document.getElementById('improved-code').textContent = improved;
-      document.getElementById('explanation').textContent = explanation;
+        document.getElementById('provided-code').textContent = provided;
+        document.getElementById('improved-code').textContent = improved;
+        document.getElementById('explanation').textContent = explanation;
+
+        var linksSection = document.getElementById('learning-links-section');
+        var linksList = document.getElementById('learning-links');
+
+        linksList.innerHTML = '';
+
+        if (learningLinksEncoded) {
+            try {
+                var links = JSON.parse(learningLinksEncoded); // 이미 JSON 문자열이므로 바로 파싱
+                if (Array.isArray(links) && links.length > 0) {
+                    links.forEach(function(link) {
+                        var li = document.createElement('li');
+                        var a = document.createElement('a');
+                        a.href = link.url;
+                        a.textContent = link.title || link.url;
+                        a.target = "_blank";
+                        a.className = "hover:underline";
+                        li.appendChild(a);
+                        linksList.appendChild(li);
+                    });
+                    linksSection.classList.remove('hidden');
+                } else {
+                    linksSection.classList.add('hidden');
+                }
+            } catch (e) {
+                console.error('Failed to parse learning links JSON', e);
+                linksSection.classList.add('hidden');
+            }
+        } else {
+            linksSection.classList.add('hidden');
+        }
     }
 </script>
-
 </body>
 </html>

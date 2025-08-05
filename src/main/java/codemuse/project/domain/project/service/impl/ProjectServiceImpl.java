@@ -2,22 +2,29 @@ package codemuse.project.domain.project.service.impl;
 
 import codemuse.project.domain.code.entity.Code;
 import codemuse.project.domain.code.repository.CodeRepository;
+import codemuse.project.domain.link.entity.Link;
+import codemuse.project.domain.project.dto.CodeDto;
 import codemuse.project.domain.project.dto.CreateProjectDto;
+import codemuse.project.domain.project.dto.LinkDto;
+import codemuse.project.domain.project.dto.ProjectDto;
 import codemuse.project.domain.project.entity.Project;
 import codemuse.project.domain.project.repository.ProjectRepository;
 import codemuse.project.domain.project.service.ProjectService;
+import codemuse.project.domain.review.repository.ReviewRepository;
 import codemuse.project.domain.user.entity.User;
 import codemuse.project.domain.user.repository.UserRepository;
 import codemuse.project.global.security.spring.CustomUserDetails;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -28,15 +35,24 @@ public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final CodeRepository codeRepository;
-
+    private final ObjectMapper objectMapper;
     /**
      * 프로젝트 리스트 반환
      */
     @Override
-    public List<Project> findAllProject(CustomUserDetails customUserDetails) {
+    public List<ProjectDto> findAllProject(CustomUserDetails customUserDetails) {
         User user = customUserDetails.getUser();
+        List<ProjectDto> list = new ArrayList<>();
 
-        return new ArrayList<>(user.getProjects());
+        for (Project p : user.getProjects()) {
+            ProjectDto dto = new ProjectDto();
+            dto.setId(p.getId());
+            dto.setTitle(p.getTitle());
+            dto.setDescription(p.getDescription());
+            list.add(dto);
+        }
+
+        return list;
     }
 
     /**
@@ -66,38 +82,43 @@ public class ProjectServiceImpl implements ProjectService {
                 .orElseThrow(() -> new IllegalArgumentException("프로젝트 정보가 없습니다."));
         User user = customUserDetails.getUser();
 
-        projectRepository.delete(project);
         user.getProjects().remove(project);
+        project.setUser(null);
+        projectRepository.delete(project);
     }
 
     @Override
-    public List<Code> getCodeList(CustomUserDetails customUserDetails,
+    public List<CodeDto> getCodeList(CustomUserDetails customUserDetails,
                                              Long projectId) {
         User user = customUserDetails.getUser();
-        List<Code> codes = null;
+        List<CodeDto> codes = new ArrayList<>();
+
         for(Project p : user.getProjects()){
             if(Objects.equals(p.getId(), projectId)){
-                codes = new ArrayList<>(p.getCodes());
-                break;
+                for(Code c : p.getCodes()){
+                    CodeDto dto = new CodeDto();
+                    dto.setProvidedCode(c.getProvidedCode());
+                    dto.setReview(c.getReview());
+                    dto.setId(c.getId());
+                    codes.add(dto);
+                }
             }
         }
 
-        if(codes == null){
-            throw new IllegalArgumentException("해당 프로젝트에 저장된 코드가 없습니다.");
-        }
-
         return codes;
-
-//        Project project = projectRepository.findById(projectId)
-//                .orElseThrow(() -> new IllegalArgumentException("프로젝트 정보가 없습니다."));
-//
-//        return project.getCodes();
     }
 
     @Override
-    public Project getProject(Long projectId) {
-        return projectRepository.findById(projectId)
+    public ProjectDto getProject(Long projectId) {
+        Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 ID의 프로젝트가 없습니다."));
+
+        ProjectDto dto = new ProjectDto();
+        dto.setDescription(project.getDescription());
+        dto.setTitle(project.getTitle());
+        dto.setId(project.getId());
+
+        return dto;
     }
 
     @Override
@@ -110,7 +131,24 @@ public class ProjectServiceImpl implements ProjectService {
 
         findProject.getCodes().remove(code);
         codeRepository.delete(code);
-
     }
 
+    @Override
+    public String EncodeLink(List<CodeDto> codes) throws JsonProcessingException {
+
+        List<LinkDto> links = new ArrayList<>();
+
+        for (CodeDto dto : codes) {
+            if (dto.getReview() != null && dto.getReview().getLinks() != null) {
+                for (Link l : dto.getReview().getLinks()) {
+                    LinkDto linkDto = new LinkDto(l.getTitle(), l.getUrl());
+                    links.add(linkDto);
+                }
+            }else{
+                throw new IllegalArgumentException("Review 객체가 null입니다.");
+            }
+        }
+
+        return objectMapper.writeValueAsString(links);
+    }
 }

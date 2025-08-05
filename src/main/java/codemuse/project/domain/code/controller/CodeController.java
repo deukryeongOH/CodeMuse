@@ -28,9 +28,7 @@ public class CodeController {
 
     @PostMapping("/uploadCode")
     public String upload(@ModelAttribute("uploadRequestDto") UploadRequestDto dto,
-//                         @RequestParam(value = "codeFile", required = false) MultipartFile file,
-//                         @RequestParam(value = "codeText", required = false) String textCode,
-                         @AuthenticationPrincipal CustomUserDetails customUserDetails,
+                        @AuthenticationPrincipal CustomUserDetails customUserDetails,
                          Model model) throws Exception {
         User user = customUserDetails.getUser();
         Long codeId = codeService.checkInput(dto);

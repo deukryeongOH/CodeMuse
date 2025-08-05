@@ -1,4 +1,4 @@
-package codemuse.project.domain.log.entity;
+package codemuse.project.domain.learn.entity;
 
 import codemuse.project.domain.review.entity.Review;
 import codemuse.project.domain.user.entity.User;
@@ -11,8 +11,8 @@ import java.util.Date;
 @Getter
 @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "log")
-public class Log {
+@Table(name = "learn")
+public class Learn {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

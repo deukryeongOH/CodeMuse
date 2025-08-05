@@ -1,8 +1,6 @@
 package codemuse.project.global.ai;
 
 import codemuse.project.domain.code.dto.CodeFeedBackDto;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonReadFeature;
 import com.fasterxml.jackson.databind.JsonNode;

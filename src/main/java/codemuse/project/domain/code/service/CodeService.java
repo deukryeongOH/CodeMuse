@@ -15,6 +15,5 @@ import java.util.List;
 @Service
 public interface CodeService {
     CodeFeedBackDto analyzeAndDevelop(Long codeId);
-    Long saveCode(Long projectId, String code) throws IOException;
     Long checkInput(UploadRequestDto dto) throws IOException;
 }

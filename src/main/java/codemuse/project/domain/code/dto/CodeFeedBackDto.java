@@ -14,9 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CodeFeedBackDto {
 
-
-    private Long reviewId;
-
     @JsonProperty("improvedCode")
     private String improvedCode;
 

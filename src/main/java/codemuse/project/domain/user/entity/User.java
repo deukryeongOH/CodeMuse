@@ -1,7 +1,7 @@
 package codemuse.project.domain.user.entity;
 
 import codemuse.project.global.role.Role;
-import codemuse.project.domain.log.entity.Log;
+import codemuse.project.domain.learn.entity.Learn;
 import codemuse.project.domain.project.entity.Project;
 import jakarta.persistence.*;
 import lombok.*;
@@ -55,7 +55,7 @@ public class User {
             orphanRemoval = true,
             fetch = FetchType.LAZY
     )
-    private List<Log> logs;
+    private List<Learn> learns;
 
 
     @Builder

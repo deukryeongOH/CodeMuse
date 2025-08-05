@@ -8,7 +8,6 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class LearningLink {
-
     private String title;
     private String url;
 }

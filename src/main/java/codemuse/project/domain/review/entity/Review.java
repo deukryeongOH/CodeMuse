@@ -1,12 +1,13 @@
 package codemuse.project.domain.review.entity;
 
+import codemuse.project.domain.code.dto.LearningLink;
 import codemuse.project.domain.code.entity.Code;
-import codemuse.project.domain.example.entity.Example;
-import codemuse.project.domain.log.entity.Log;
+import codemuse.project.domain.link.entity.Link;
+import codemuse.project.domain.learn.entity.Learn;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,39 +21,30 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "code_id", nullable = false)
+    @OneToOne(mappedBy = "review")
     private Code code;
 
     @Lob
-    @Column(name = "explanation", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "explanation", columnDefinition = "TEXT")
     private String explanation; // 설명
 
     @Lob
-    @Column(name = "improvedCode", nullable = false, columnDefinition = "TEXT")
-    private String improvedCode;
-    private Date createdAt;
+    @Column(name = "improvedCode", columnDefinition = "TEXT")
+    private String improvedCode; // 개선된 코드
+    private LocalDateTime createdAt;
 
     @OneToMany(
             mappedBy = "review",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
-            fetch = FetchType.LAZY
+            fetch = FetchType.EAGER
     )
-    private List<Example> examples;
-
-    @OneToMany(
-            mappedBy = "review",
-            cascade = CascadeType.ALL,
-            orphanRemoval = true,
-            fetch = FetchType.LAZY
-    )
-    private List<Log> logs;
+    private List<Link> links;
 
     @Builder
-    public Review(String explanation, String improvedCode, Code code){
+    public Review(String explanation, String improvedCode) {
         this.explanation = explanation;
         this.improvedCode = improvedCode;
-        this.code = code;
+        this.createdAt = LocalDateTime.now();
     }
 }
