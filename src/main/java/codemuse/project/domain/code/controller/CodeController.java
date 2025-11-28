@@ -42,7 +42,7 @@ public class CodeController {
         CodeFeedBackDto feedBackDto = codeService.analyzeAndDevelop(codeId);
         model.addAttribute("aiFeedback", feedBackDto);
         model.addAttribute("projects", user.getProjects());
-
+        model.addAttribute("codeId", codeId);
         return "dashboard";
     }
 }
