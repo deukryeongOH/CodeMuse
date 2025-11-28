@@ -42,17 +42,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectDto> findAllProject(CustomUserDetails customUserDetails) {
         User user = customUserDetails.getUser();
-        List<ProjectDto> list = new ArrayList<>();
-
-        for (Project p : user.getProjects()) {
-            ProjectDto dto = new ProjectDto();
-            dto.setId(p.getId());
-            dto.setTitle(p.getTitle());
-            dto.setDescription(p.getDescription());
-            list.add(dto);
-        }
-
-        return list;
+        return user.getProjects().stream()
+                .map(p -> new ProjectDto(p.getId(), p.getTitle(), p.getDescription()))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -88,8 +80,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<CodeDto> getCodeList(CustomUserDetails customUserDetails,
-                                             Long projectId) {
+    public List<CodeDto> getCodeList(CustomUserDetails customUserDetails, Long projectId) {
         User user = customUserDetails.getUser();
         List<CodeDto> codes = new ArrayList<>();
 
