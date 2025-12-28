@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CodeMuse</title>
+    <title>마이페이지 - CodeMuse</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } } } }
+    </script>
     <style>
         @keyframes bgAnimation {
           0% { background-position: 0% 50%; }
@@ -12,75 +16,56 @@
           100% { background-position: 0% 50%; }
         }
         .animated-bg {
-          background: linear-gradient(-45deg, #1a202c, #2d3748, #4a5568, #718096);
+          background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #475569);
           background-size: 400% 400%;
-          animation: bgAnimation 20s ease infinite;
+          animation: bgAnimation 25s ease infinite;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center animated-bg overflow-hidden">
+<body class="min-h-screen flex items-center justify-center animated-bg overflow-hidden font-sans text-gray-100">
 
-<div class="bg-gray-800 bg-opacity-80 backdrop-blur-sm p-8 rounded-2xl shadow-xl w-full max-w-md text-white space-y-6">
-    <h2 class="text-2xl font-bold text-center">계정 관리</h2>
+<div class="bg-gray-900 bg-opacity-60 backdrop-blur-xl p-10 rounded-3xl shadow-2xl border border-gray-700/50 w-full max-w-lg space-y-8 relative">
+    <div class="flex items-center justify-between">
+        <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500">계정 관리</h2>
+        <a th:href="@{/user/changePassword}" class="text-sm text-cyan-400 hover:text-cyan-300 font-semibold transition bg-cyan-900/30 px-3 py-1.5 rounded-lg border border-cyan-500/30">비밀번호 변경</a>
+    </div>
 
-    <form th:action="@{/user/myPage}" method="post" th:object="${userDetailsDto}" class="space-y-4">
+    <form th:action="@{/user/myPage}" method="post" th:object="${userDetailsDto}" class="space-y-5">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-        <!-- 아이디 (읽기 전용) -->
         <div>
-            <label class="block font-medium mb-1">아이디</label>
-            <input type="text"
-                   th:field="*{accountId}"
-                   disabled
-                   class="w-full px-4 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+            <label class="block font-medium mb-2 text-sm text-gray-300 ml-1">아이디</label>
+            <input type="text" th:field="*{accountId}" disabled
+                   class="w-full px-5 py-3 bg-gray-800/30 border border-gray-700 rounded-xl text-gray-400 cursor-not-allowed shadow-inner" />
         </div>
 
-        <!-- 비밀번호 변경 링크 -->
         <div>
-            <label class="block font-medium mb-1">비밀번호</label>
-            <a th:href="@{/user/changePassword}"
-               class="text-cyan-400 hover:underline transition">
-                비밀번호 변경
-            </a>
+            <label for="name" class="block font-medium mb-2 text-sm text-gray-300 ml-1">이름</label>
+            <input id="name" type="text" th:field="*{name}"
+                   class="w-full px-5 py-3 bg-gray-800/50 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 text-white transition-all shadow-inner" />
         </div>
 
-        <!-- 이름 -->
         <div>
-            <label for="name" class="block font-medium mb-1">이름</label>
-            <input id="name" type="text"
-                   th:field="*{name}"
-                   placeholder="이름을 입력하세요"
-                   class="w-full px-4 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+            <label for="email" class="block font-medium mb-2 text-sm text-gray-300 ml-1">이메일</label>
+            <input id="email" type="email" th:field="*{email}"
+                   class="w-full px-5 py-3 bg-gray-800/50 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 text-white transition-all shadow-inner" />
         </div>
 
-        <!-- 이메일 -->
         <div>
-            <label for="email" class="block font-medium mb-1">이메일</label>
-            <input id="email" type="email"
-                   th:field="*{email}"
-                   placeholder="이메일을 입력하세요"
-                   class="w-full px-4 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400" />
+            <label for="nickName" class="block font-medium mb-2 text-sm text-gray-300 ml-1">닉네임</label>
+            <input id="nickName" type="text" th:field="*{nickName}"
+                   class="w-full px-5 py-3 bg-gray-800/50 border border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 text-white transition-all shadow-inner" />
         </div>
 
-        <!-- 닉네임 -->
-        <div>
-            <label for="nickName" class="block font-medium mb-1">닉네임</label>
-            <input id="nickName" type="text"
-                   th:field="*{nickName}"
-                   placeholder="닉네임을 입력하세요"
-                   class="w-full px-4 py-2 bg-gray-700 rounded focus:outline-none focus:ring-2 focus:ring-cyan-400" />
-        </div>
-
-        <!-- 액션 버튼 -->
-        <div class="flex justify-between items-center mt-6">
+        <div class="flex space-x-3 pt-4">
             <button type="submit"
-                    class="px-4 py-2 bg-cyan-500 rounded-md font-semibold hover:bg-cyan-600 transition">
-                개인정보 변경
+                    class="flex-1 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-blue-500/40">
+                변경 저장
             </button>
             <button type="button"
                     th:onclick="|location.href='@{/dashboard}'|"
-                    class="px-4 py-2 bg-gray-500 rounded-md font-semibold hover:bg-gray-600 transition">
-                메인 페이지
+                    class="px-6 py-3 bg-gray-700 text-gray-200 font-bold rounded-xl hover:bg-gray-600 transition-all">
+                취소
             </button>
         </div>
     </form>

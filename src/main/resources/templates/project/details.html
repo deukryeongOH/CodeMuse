@@ -3,85 +3,156 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CodeMuse</title>
+    <title>CodeMuse - 프로젝트 상세</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
+        /* 배경 애니메이션 */
         @keyframes bgAnimation {
           0% { background-position: 0% 50%; }
           50% { background-position: 100% 50%; }
           100% { background-position: 0% 50%; }
         }
         .animated-bg {
-          background: linear-gradient(-45deg, #1a202c, #2d3748, #4a5568, #718096);
+          background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #475569);
           background-size: 400% 400%;
-          animation: bgAnimation 20s ease infinite;
+          animation: bgAnimation 25s ease infinite;
+        }
+        /* 스크롤바 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* 사이드바 활성화 효과 */
+        .sidebar-item-active {
+            background-color: rgba(6, 182, 212, 0.15);
+            border-left: 4px solid #06b6d4;
+            color: #22d3ee;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="min-h-screen flex flex-col animated-bg text-gray-100 font-sans antialiased overflow-hidden">
 
-<!-- 오른쪽 상단 홈 버튼 -->
-<a th:href="@{/dashboard}"
-   class="absolute top-4 right-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow">
-    홈
-</a>
+<header class="flex items-center justify-between px-6 py-4 border-b border-gray-700/50 bg-gray-900/40 backdrop-blur-md z-50 h-20">
+    <div class="flex items-center space-x-3">
+        <img th:src="@{/images/CodeMuseIcon.png}" class="h-12 w-auto object-contain drop-shadow-md"/>
+        <h1 class="text-xl font-bold text-gray-200">
+            <span class="text-gray-500 mr-2">Projects /</span>
+            <span th:text="${title}" class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-400">프로젝트 제목</span>
+        </h1>
+    </div>
+    <div class="flex items-center space-x-3">
+        <a th:href="@{/project/manageProjects}" class="px-4 py-2 text-sm bg-gray-800 border border-gray-600 rounded-lg hover:bg-gray-700 transition">목록으로</a>
+        <a th:href="@{/dashboard}" class="px-4 py-2 text-sm bg-cyan-600 text-white rounded-lg hover:bg-cyan-500 transition font-bold shadow-lg shadow-cyan-900/20">홈으로 이동</a>
+    </div>
+</header>
 
-<div class="flex min-h-screen">
+<div class="flex flex-1 overflow-hidden"> <aside class="w-1/4 min-w-[300px] bg-gray-900/60 backdrop-blur-xl border-r border-gray-700/50 flex flex-col h-full">
+    <div class="p-6 border-b border-gray-700/50">
+        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-1">Code List</h3>
+        <p class="text-xs text-gray-500">분석된 코드 목록을 선택하세요</p>
+    </div>
 
-    <!-- 사이드바 -->
-    <aside class="w-1/4 p-4 bg-gray-800 overflow-auto">
-        <h3 class="text-xl font-semibold mb-4 text-white">프로젝트 코드 목록</h3>
-        <ul class="space-y-3">
-            <li th:each="code : ${codes}" class="flex justify-between items-center">
+    <ul class="flex-1 overflow-y-auto p-4 space-y-2">
+        <li th:each="code : ${codes}" class="group">
+            <div class="flex justify-between items-center p-3 rounded-lg hover:bg-gray-800/50 transition-all border border-transparent hover:border-gray-700 cursor-pointer"
+                 onclick="selectCodeItem(this)">
+
                 <a href="javascript:void(0)"
-                   class="text-blue-400 hover:underline flex-1"
+                   class="flex-1 text-sm font-medium text-gray-300 group-hover:text-cyan-300 truncate pr-2"
                    th:attr="
-             data-provided-code=${code.providedCode},
-             data-improved-code=${code.review != null} ? ${code.review.improvedCode} : '',
-             data-explanation=${code.review != null} ? ${code.review.explanation} : '',
-             data-learning-links=${linksJson}"
-                th:text="${code.id}"
+                         data-provided-code=${code.providedCode},
+                         data-improved-code=${code.review != null} ? ${code.review.improvedCode} : '',
+                         data-explanation=${code.review != null} ? ${code.review.explanation} : '',
+                         data-learning-links=${linksJson}"
+                   th:text="'Code ID: ' + ${code.id}"
                    onclick="showCode(this); return false;">
                 </a>
+
                 <form th:action="@{/project/{projectId}/delete/code/{codeId}(projectId=${projectId},codeId=${code.id})}"
                       th:method="post"
-                      class="inline">
+                      class="inline-block opacity-0 group-hover:opacity-100 transition-opacity">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-                    <button type="submit"
-                            class="ml-2 px-2 py-1 bg-red-600 hover:bg-red-700 rounded text-white text-sm">
-                        삭제
+                    <button type="submit" title="삭제"
+                            onclick="event.stopPropagation(); return confirm('삭제하시겠습니까?');"
+                            class="p-1.5 text-red-400 hover:bg-red-900/30 rounded-md transition">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                        </svg>
                     </button>
                 </form>
-            </li>
-        </ul>
-    </aside>
+            </div>
+        </li>
+        <li th:if="${#lists.isEmpty(codes)}" class="text-center p-4 text-gray-500 text-sm italic">
+            등록된 코드가 없습니다.
+        </li>
+    </ul>
+</aside>
 
-    <!-- 중앙 내용 -->
-    <main class="w-3/4 p-8 bg-gray-900 text-white overflow-auto">
-        <h2 class="text-3xl font-semibold mb-4" th:text="${title}">프로젝트 제목</h2>
-        <p class="text-lg mb-8" th:text="${description}">프로젝트 설명</p>
+    <main class="flex-1 overflow-y-auto p-8 relative">
+        <div class="max-w-5xl mx-auto space-y-6">
 
-        <div id="code-content" class="bg-gray-700 p-4 rounded-lg shadow-lg text-gray-200">
-            <!-- 클릭 전 안내 -->
-            <p id="placeholder" class="italic">목록에서 코드를 클릭하면 여기에 표시됩니다.</p>
+            <div class="bg-gray-800/40 rounded-xl p-6 border border-gray-700/50 mb-8">
+                <h2 class="text-lg font-bold text-gray-200 mb-2">📌 프로젝트 설명</h2>
+                <p class="text-gray-400 leading-relaxed" th:text="${description}">프로젝트 설명 내용...</p>
+            </div>
 
-            <!-- 클릭 후 상세 뷰 -->
-            <div id="detail-view" class="hidden space-y-6">
-                <div>
-                    <h4 class="font-semibold mb-1">🔹 제공된 코드</h4>
-                    <pre id="provided-code" class="bg-gray-800 p-3 rounded whitespace-pre-wrap"></pre>
+            <div id="code-content" class="space-y-6">
+                <div id="placeholder" class="flex flex-col items-center justify-center py-20 text-gray-500 border-2 border-dashed border-gray-700 rounded-3xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 mb-4 opacity-50">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75L22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3l-4.5 16.5" />
+                    </svg>
+                    <p class="text-lg font-medium">왼쪽 목록에서 코드를 선택하여 상세 내용을 확인하세요.</p>
                 </div>
-                <div>
-                    <h4 class="font-semibold mb-1">🔹 개선된 코드</h4>
-                    <pre id="improved-code" class="bg-gray-800 p-3 rounded whitespace-pre-wrap"></pre>
-                </div>
-                <div>
-                    <h4 class="font-semibold mb-1">🔹 설명</h4>
-                    <p id="explanation" class="bg-gray-800 p-3 rounded whitespace-pre-wrap"></p>
-                </div>
-                <div id="learning-links-section" class="hidden">
-                    <h4 class="font-semibold mb-1">🔹 관련 학습 링크</h4>
-                    <p id="learning-links" class="bg-gray-800 p-3 rounded whitespace-pre-wrap"></p>
+
+                <div id="detail-view" class="hidden space-y-8 animate-fade-in">
+
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <div class="bg-[#0d1117] rounded-2xl border border-gray-700/50 overflow-hidden shadow-lg flex flex-col h-[500px]">
+                            <div class="bg-gray-800/80 px-4 py-3 border-b border-gray-700 flex justify-between items-center">
+                                <span class="font-bold text-sm text-gray-300">📄 제공된 코드 (Original)</span>
+                            </div>
+                            <pre id="provided-code" class="p-4 overflow-auto font-mono text-sm text-gray-300 flex-1 custom-scrollbar"></pre>
+                        </div>
+
+                        <div class="bg-[#0d1117] rounded-2xl border border-emerald-900/30 overflow-hidden shadow-lg flex flex-col h-[500px] ring-1 ring-emerald-500/20">
+                            <div class="bg-emerald-900/20 px-4 py-3 border-b border-emerald-900/30 flex justify-between items-center">
+                                <span class="font-bold text-sm text-emerald-400">✨ 개선된 코드 (Improved)</span>
+                            </div>
+                            <pre id="improved-code" class="p-4 overflow-auto font-mono text-sm text-emerald-100 flex-1 custom-scrollbar"></pre>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800/60 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 shadow-lg">
+                        <h4 class="text-lg font-bold text-blue-400 mb-4 flex items-center">
+                            <span class="mr-2">💡</span> AI 코드 분석 및 설명
+                        </h4>
+                        <div class="bg-gray-900/50 rounded-xl p-5 border border-gray-700/50">
+                            <p id="explanation" class="text-gray-200 leading-relaxed whitespace-pre-wrap"></p>
+                        </div>
+                    </div>
+
+                    <div id="learning-links-section" class="hidden bg-gray-800/60 backdrop-blur-md rounded-2xl p-6 border border-gray-700/50 shadow-lg">
+                        <h4 class="text-lg font-bold text-purple-400 mb-4 flex items-center">
+                            <span class="mr-2">📚</span> 관련 학습 자료
+                        </h4>
+                        <ul id="learning-links" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
@@ -89,16 +160,16 @@
 </div>
 
 <script th:inline="javascript">
-    // Base64 디코딩 함수 (UTF-8 문자 깨짐 방지)
-    function decodeBase64(str) {
-        try {
-            return decodeURIComponent(atob(str).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join(''));
-        } catch (e) {
-            console.error('Base64 decode failed', e);
-            return '[]'; // 오류 발생 시 빈 배열 형태의 문자열 반환
-        }
+    function selectCodeItem(element) {
+        // 모든 항목의 활성 스타일 제거
+        document.querySelectorAll('aside li > div').forEach(div => {
+            div.classList.remove('sidebar-item-active', 'bg-gray-800');
+            div.classList.add('hover:bg-gray-800/50');
+        });
+
+        // 선택된 항목 스타일 적용
+        element.classList.remove('hover:bg-gray-800/50');
+        element.classList.add('sidebar-item-active');
     }
 
     function showCode(el) {
@@ -108,7 +179,7 @@
         var provided = el.getAttribute('data-provided-code') || '';
         var improved = el.getAttribute('data-improved-code') || '';
         var explanation = el.getAttribute('data-explanation') || '';
-        var learningLinksEncoded = el.getAttribute('data-learning-links') || ''; // 링크 데이터는 이미 JSON 문자열 형태
+        var learningLinksEncoded = el.getAttribute('data-learning-links') || '';
 
         document.getElementById('provided-code').textContent = provided;
         document.getElementById('improved-code').textContent = improved;
@@ -121,15 +192,19 @@
 
         if (learningLinksEncoded) {
             try {
-                var links = JSON.parse(learningLinksEncoded); // 이미 JSON 문자열이므로 바로 파싱
+                var links = JSON.parse(learningLinksEncoded);
                 if (Array.isArray(links) && links.length > 0) {
                     links.forEach(function(link) {
                         var li = document.createElement('li');
+                        li.className = "bg-gray-900/50 p-3 rounded-lg border border-gray-700 hover:border-purple-500/50 transition-colors group";
+
                         var a = document.createElement('a');
                         a.href = link.url;
-                        a.textContent = link.title || link.url;
                         a.target = "_blank";
-                        a.className = "hover:underline";
+                        a.className = "flex items-center space-x-2 text-gray-300 group-hover:text-white transition-colors";
+
+                        a.innerHTML = `<span class="text-purple-400">🔗</span><span class="underline decoration-gray-600 group-hover:decoration-purple-400 underline-offset-2">${link.title || link.url}</span>`;
+
                         li.appendChild(a);
                         linksList.appendChild(li);
                     });
@@ -146,5 +221,12 @@
         }
     }
 </script>
+<style>
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+    .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #1f2937; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 4px; }
+</style>
 </body>
 </html>

@@ -72,7 +72,6 @@ public class ProjectController {
         List<CodeDto> codes = projectService.getCodeList(customUserDetails, projectId);
         ProjectDto projectDto = projectService.getProject(projectId);
 
-        // 여기가 문제
         String linkJson = projectService.EncodeLink(codes);
 
         model.addAttribute("codes", codes);

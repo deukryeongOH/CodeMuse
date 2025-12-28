@@ -13,5 +13,8 @@ public class ProjectDto {
     private String description;
 
     public ProjectDto(Long id, String title, String description) {
+        this.id=id;
+        this.title=title;
+        this.description = description;
     }
 }

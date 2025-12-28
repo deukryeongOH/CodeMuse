@@ -5,57 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CodeMuse - Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
     <style>
+        /* 배경 애니메이션 (대시보드와 동일) */
         @keyframes bgAnimation {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
         }
         .animated-bg {
-            background: linear-gradient(-45deg, #1a202c, #2d3748, #4a5568, #718096);
-            background-size: 400% 400%;
-            animation: bgAnimation 20s ease infinite;
+          background: linear-gradient(-45deg, #0f172a, #1e293b, #334155, #475569);
+          background-size: 400% 400%;
+          animation: bgAnimation 25s ease infinite;
         }
-        .correct-answer { background-color: #38a169 !important; border-color: #38a169 !important; color: white; }
-        .wrong-answer { background-color: #e53e3e !important; border-color: #e53e3e !important; color: white; }
+
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 10px; }
+        ::-webkit-scrollbar-track { background: #1e293b; }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 5px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+        /* 정답/오답 스타일 (Tailwind 클래스와 충돌 방지를 위해 important 사용) */
+        .correct-answer {
+            background: linear-gradient(to right, #059669, #10b981) !important;
+            border-color: #34d399 !important;
+            color: white !important;
+            font-weight: bold;
+        }
+        .wrong-answer {
+            background: linear-gradient(to right, #dc2626, #ef4444) !important;
+            border-color: #f87171 !important;
+            color: white !important;
+        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col animated-bg text-white">
+<body class="min-h-screen flex flex-col animated-bg text-gray-100 font-sans antialiased">
 
-<header class="flex items-center justify-between px-6 py-4 border-b border-gray-600 bg-gray-900 bg-opacity-50 sticky top-0 z-50">
-    <div class="flex items-center space-x-2">
-        <h1 class="text-2xl font-bold text-cyan-400">CodeMuse Quiz</h1>
+<header class="flex flex-col md:flex-row md:items-center justify-between px-6 py-4 border-b border-gray-700/50 bg-gray-900/40 backdrop-blur-md sticky top-0 z-50">
+    <div class="flex items-center space-x-3 group">
+        <img th:src="@{/images/CodeMuseIcon.png}"
+             alt="CodeMuse Logo"
+             class="h-16 w-auto object-contain drop-shadow-[0_0_10px_rgba(6,182,212,0.5)] transition-transform duration-300 group-hover:scale-110"/>
+        <span class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 hidden sm:block"></span>
     </div>
-    <a th:href="@{/dashboard}" class="text-gray-300 hover:text-white transition">← 대시보드로 돌아가기</a>
+
+    <a th:href="@{/dashboard}" class="mt-4 md:mt-0 px-5 py-2 rounded-full border border-gray-600 bg-gray-800/50 hover:bg-gray-700 hover:border-cyan-500 transition-all text-sm font-semibold flex items-center space-x-2 group">
+        <span class="group-hover:-translate-x-1 transition-transform">←</span>
+        <span>대시보드로 돌아가기</span>
+    </a>
 </header>
 
-<div class="flex-grow container mx-auto p-6 max-w-5xl space-y-8">
-    <section class="space-y-6">
-        <div th:each="quiz, i : ${quizDto}" class="bg-gray-800 bg-opacity-90 rounded-xl p-6 shadow-lg border-l-4 border-cyan-500 relative">
-            <div class="absolute top-4 right-4 text-gray-500 font-bold text-lg" th:text="'Q' + ${i.count}"></div>
+<div class="flex-grow container mx-auto p-6 md:p-12 max-w-4xl space-y-10">
 
-            <h3 class="text-lg font-semibold mb-6 pr-8" th:text="${quiz.question}">문제 내용이 들어갑니다.</h3>
+    <div class="text-center space-y-2">
+        <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-emerald-300">
+            학습 점검 퀴즈
+        </h2>
+        <p class="text-gray-400">분석된 코드를 바탕으로 생성된 퀴즈를 풀며 지식을 내 것으로 만드세요.</p>
+    </div>
 
-            <div class="grid grid-cols-1 gap-3 mb-4" th:id="'options-' + ${i.index}">
+    <section class="space-y-8">
+        <div th:each="quiz, i : ${quizDto}" class="bg-gray-900 bg-opacity-60 backdrop-blur-xl rounded-3xl p-8 shadow-2xl border border-gray-700/50 relative overflow-hidden transition-all hover:shadow-cyan-900/20">
+
+            <div class="absolute top-0 right-0 p-6">
+                <span class="px-4 py-2 bg-gray-800/80 rounded-xl text-cyan-400 font-bold text-xl border border-gray-700 shadow-inner" th:text="'Q' + ${i.count}">Q1</span>
+            </div>
+
+            <h3 class="text-xl md:text-2xl font-bold mb-8 pr-16 leading-relaxed text-gray-100">
+                <span class="text-cyan-500 mr-2">●</span>
+                <span th:text="${quiz.question}">문제 내용이 들어갑니다.</span>
+            </h3>
+
+            <div class="grid grid-cols-1 gap-4 mb-6" th:id="'options-' + ${i.index}">
                 <button th:each="option, optStat : ${quiz.options}"
                         type="button"
-                        class="quiz-option text-left px-4 py-3 rounded-lg border border-gray-600 hover:bg-gray-700 transition flex items-center"
+                        class="quiz-option group relative text-left px-6 py-4 rounded-xl border border-gray-600/50 bg-gray-800/40 hover:bg-gray-700/60 hover:border-cyan-500/50 transition-all duration-200 flex items-center w-full"
                         th:onclick="checkAnswer(this, [[${i.index}]], [[${optStat.index + 1}]], [[${quiz.answer}]])">
-                    <span class="w-6 h-6 rounded-full border border-gray-500 flex items-center justify-center mr-3 text-sm font-mono" th:text="${optStat.index + 1}">1</span>
-                    <span th:text="${option}">보기 내용</span>
+                    <span class="flex-shrink-0 w-8 h-8 rounded-lg bg-gray-700/50 text-gray-300 flex items-center justify-center mr-4 text-sm font-mono font-bold group-hover:bg-cyan-900/50 group-hover:text-cyan-300 transition-colors" th:text="${optStat.index + 1}">1</span>
+                    <span class="text-gray-200 font-medium group-hover:text-white" th:text="${option}">보기 내용</span>
                 </button>
             </div>
 
-            <div th:id="'feedback-' + ${i.index}" class="hidden mt-4 p-4 rounded bg-gray-700 border border-gray-600">
-                <p class="font-bold text-lg mb-1 result-text"></p>
-                <p class="text-gray-300 text-sm explanation" th:text="${quiz.explanation}">해설 내용</p>
+            <div th:id="'feedback-' + ${i.index}" class="hidden mt-6 p-6 rounded-2xl bg-gray-950/50 border border-gray-700/50 animate-fade-in-down">
+                <div class="flex items-center space-x-2 mb-3">
+                    <span class="result-icon text-2xl"></span>
+                    <p class="font-bold text-xl result-text"></p>
+                </div>
+                <div class="pl-2 border-l-4 border-gray-600 ml-1">
+                    <p class="text-gray-300 text-base leading-relaxed pl-4 explanation font-light" th:text="${quiz.explanation}">해설 내용</p>
+                </div>
             </div>
         </div>
     </section>
 
     <div class="text-center py-8">
-        <a th:href="@{/dashboard}" class="px-8 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg text-lg font-bold transition shadow-lg">
-            학습 완료
+        <a th:href="@{/dashboard}" class="inline-block px-10 py-4 bg-gradient-to-r from-cyan-600 to-blue-600 text-white font-bold rounded-xl text-lg hover:from-cyan-500 hover:to-blue-500 transition-all transform hover:-translate-y-1 shadow-lg hover:shadow-cyan-500/40">
+            학습 완료 및 돌아가기
         </a>
     </div>
 
@@ -67,6 +125,7 @@
         const feedbackDiv = document.getElementById('feedback-' + quizIndex);
         const buttons = parentDiv.querySelectorAll('button');
         const resultText = feedbackDiv.querySelector('.result-text');
+        const resultIcon = feedbackDiv.querySelector('.result-icon');
 
         // 이미 정답을 체크했으면 동작하지 않음
         if (!feedbackDiv.classList.contains('hidden')) return;
@@ -74,28 +133,43 @@
         // 모든 버튼 비활성화 및 스타일 적용
         buttons.forEach((b, index) => {
             b.disabled = true;
-            b.classList.remove('hover:bg-gray-700');
+            b.classList.remove('hover:bg-gray-700/60', 'hover:border-cyan-500/50'); // 호버 효과 제거
+            b.classList.add('cursor-default');
+
             const currentOption = index + 1;
 
             if (currentOption === correctAnswer) {
-                b.classList.add('correct-answer'); // 정답 표시
+                b.classList.add('correct-answer'); // 정답 스타일 (초록 그라데이션)
+                // 체크 아이콘 추가 등 추가적인 DOM 조작 가능
             } else if (currentOption === selectedOption && selectedOption !== correctAnswer) {
-                b.classList.add('wrong-answer'); // 내가 고른 오답 표시
+                b.classList.add('wrong-answer'); // 오답 스타일 (빨강 그라데이션)
             } else {
-                b.classList.add('opacity-50'); // 나머지 흐리게
+                b.classList.add('opacity-40', 'grayscale'); // 나머지 흐리게
             }
         });
 
         // 결과 텍스트 및 해설 표시
         if (selectedOption === correctAnswer) {
-            resultText.textContent = "정답입니다! 🎉";
-            resultText.classList.add('text-green-400');
+            resultText.textContent = "정답입니다!";
+            resultIcon.textContent = "🎉";
+            resultText.className = "font-bold text-xl result-text text-emerald-400";
         } else {
-            resultText.textContent = "아쉽네요. 틀렸습니다.";
-            resultText.classList.add('text-red-400');
+            resultText.textContent = "아쉽네요, 틀렸습니다.";
+            resultIcon.textContent = "😅";
+            resultText.className = "font-bold text-xl result-text text-red-400";
         }
         feedbackDiv.classList.remove('hidden');
     }
 </script>
+
+<style>
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in-down {
+        animation: fadeInDown 0.3s ease-out forwards;
+    }
+</style>
 </body>
 </html>
